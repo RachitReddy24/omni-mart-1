@@ -1,0 +1,87 @@
+{% extends "shop/base/base.html" %}
+{% load crispy_forms_tags %}
+{% block title %}
+Checkout
+{% endblock %}
+{% block style %}
+.chatbot-icon{
+    display:none;
+}
+{% endblock %}
+{% block content %}
+<div class="container mt-8">
+    <h1 class="text-center text-2xl font-bold text-gray-900 ">Checkout</h1>
+    <div class="order-info">
+        <h3 class="text-center text-xl font-bold text-gray-900 ">Your order</h3>
+        <ul>
+            {% for item in cart %}
+            <li>
+                <p class=" text-lg font-bold text-gray-900 ">  {{ item.quantity }}x {{ item.product.name }} </p>
+                <span class=" text-lg font-bold text-gray-900 ">${{ item.total_price }}</span>
+            </li>
+            {% endfor %}
+        </ul>
+        <h4 class=" text-lg font-bold text-gray-900 " >Total: ${{ cart.get_total_price }}</h4>
+    </div> 
+    <form action="." id="myform" method="post" class="order-form mt-4  ">
+        {% csrf_token %}
+        <h2 class="text-gray-900">First Name:</h2>
+        {{ form.first_name}}
+        <h2 class="text-gray-900">Last Name:</h2>
+        {{ form.last_name}}
+        <h2 class="text-gray-900">Email:</h2>
+        {{ form.email}}
+        <h2 class="text-gray-900">Phone Number :</h2>
+        {{ form.phone_number}}
+        <h2 class="text-gray-900">Address</h2>
+        {{ form.address}}
+        <h2 class="text-gray-900">Postal Code :</h2>
+        {{ form.postal_code}}
+        <h2 class="text-gray-900">City :</h2>
+        {{ form.city}}
+        <input class="btn bg-primary btn-primary btn-sm btn-block" type="submit" value="Place order">
+       
+    </form>
+</div>
+<script src="//cdnjs.cloudflare.com/ajax/libs/annyang/2.6.0/annyang.min.js"></script>
+
+{% endblock %}
+
+
+{% block script %}
+
+if (window.SpeechRecognition || window.webkitSpeechRecognition) {
+   var recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+   recognition.lang = 'en-US';
+   
+   recognition.onresult = function(event) {
+     var command = event.results[0][0].transcript.toLowerCase();
+     processVoiceCommand(command);
+   };
+
+   recognition.onerror = function(event) {
+     if (event.error === 'no-speech') {
+       console.log('No speech detected. Please try again.');
+     } else {
+       console.error('Speech recognition error:', event.error);
+     }
+   };
+
+   function processVoiceCommand(command) {
+     switch(command) {
+       case 'write firstname':
+         document.getElementById('first_name').value = 'John';
+         break;
+       case 'write lastname':
+         document.getElementById('last_name').value = 'Doe';
+         break;
+       // Add more cases for other commands
+     }
+   }
+
+   recognition.start();
+ } else {
+   console.error('Speech recognition not supported in this browser.');
+ }
+
+{% endblock %}

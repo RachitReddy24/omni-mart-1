@@ -1,5 +1,6 @@
 from django.db import models
 from django.urls import reverse
+from django.db.models import Index
 from django.contrib.auth.models import User
 
 class Category(models.Model):
@@ -16,8 +17,6 @@ class Category(models.Model):
 
     def get_absolute_url(self):
         return reverse('shop:product_list_by_category', args=[self.slug])
-
-
 class Product(models.Model):
     category = models.ForeignKey(Category, related_name='products',
                                  on_delete=models.CASCADE)
@@ -29,11 +28,13 @@ class Product(models.Model):
     available = models.BooleanField(default=True)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
-    vendor = models.ForeignKey(User, on_delete=models.CASCADE,default=1)
+    vendor = models.ForeignKey(User, on_delete=models.CASCADE, default=1)
 
     class Meta:
         ordering = ('name',)
-        index_together = (('id', 'slug'),)
+        indexes = [
+            Index(fields=['id', 'slug']),
+        ]
 
     def __str__(self):
         return self.name
